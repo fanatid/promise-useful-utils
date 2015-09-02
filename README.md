@@ -12,7 +12,7 @@ Thanks [bluebird](https://github.com/petkaantonov/bluebird) for inspiration.
 
 ## API
 
-[here](#blob/master/API.md)
+[here](#https://github.com/fanatid/promise-useful-utils/blob/master/API.md)
 
 ## License
 

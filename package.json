@@ -1,6 +1,6 @@
 {
   "name": "promise-useful-utils",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "useful functions for working with promises",
   "keywords": [
     "promise",
@@ -22,6 +22,7 @@
   "files": [
     "lib",
     "src",
+    "API.md",
     "LICENSE",
     "README.md"
   ],
