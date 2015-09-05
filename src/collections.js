@@ -113,6 +113,10 @@ export function map (args, mapper, options = {concurrency: Infinity}) {
     return Promise.reject(new TypeError('expecting an array'))
   }
 
+  if (args.length === 0) {
+    return Promise.resolve([])
+  }
+
   if (typeof mapper !== 'function') {
     return Promise.reject(new TypeError('fn must be a function'))
   }

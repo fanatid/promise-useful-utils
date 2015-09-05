@@ -149,7 +149,6 @@ function plainPromisifyAll (target, suffix, filter, promisifier) {
     if (!isPromisified(value) &&
         !hasPromisified(target, key, suffix) &&
         filter(key, value, target, defaultFilter(key, value, target))) {
-
       if (suffixRegexp.test(key)) {
         let keyWithoutSuffix = key.replace(suffixRegexp, '')
         if (methods[keyWithoutSuffix] !== undefined) {

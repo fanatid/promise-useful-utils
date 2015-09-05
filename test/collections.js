@@ -153,16 +153,16 @@ describe('Collections', () => {
     })
 
     it('should reject on non-function', (done) => {
-      expectError(() => { return PUtils.map([], void 0) }, TypeError, done)
+      expectError(() => { return PUtils.map([null], void 0) }, TypeError, done)
     })
 
     it('should reject on NaN', (done) => {
-      expectError(() => { return PUtils.map([], noop, '') }, TypeError, done)
+      expectError(() => { return PUtils.map([null], noop, '') }, TypeError, done)
     })
 
     it('should reject with negative', (done) => {
       expectError(() => {
-        return PUtils.map([], noop, {concurrency: -1})
+        return PUtils.map([null], noop, {concurrency: -1})
       }, TypeError, done)
     })
 
@@ -178,6 +178,15 @@ describe('Collections', () => {
       expectError(() => {
         return PUtils.map([Promise.resolve(1), Promise.reject(new T())], noop)
       }, T, done)
+    })
+
+    it('should resolve empty array for empty args', (done) => {
+      PUtils.map([], noop)
+        .catch((err) => { return err })
+        .then((value) => {
+          expect(value).to.deep.equal([])
+        })
+        .then(done, done)
     })
 
     it('check mapper arguments', (done) => {
@@ -253,16 +262,16 @@ describe('Collections', () => {
     })
 
     it('should reject on non-function', (done) => {
-      expectError(() => { return PUtils.filter([], void 0) }, TypeError, done)
+      expectError(() => { return PUtils.filter([null], void 0) }, TypeError, done)
     })
 
     it('should reject on NaN', (done) => {
-      expectError(() => { return PUtils.filter([], noop, '') }, TypeError, done)
+      expectError(() => { return PUtils.filter([null], noop, '') }, TypeError, done)
     })
 
     it('should reject with negative', (done) => {
       expectError(() => {
-        return PUtils.filter([], noop, {concurrency: -1})
+        return PUtils.filter([null], noop, {concurrency: -1})
       }, TypeError, done)
     })
 
@@ -278,6 +287,15 @@ describe('Collections', () => {
       expectError(() => {
         return PUtils.filter([Promise.resolve(1), Promise.reject(new T())], noop)
       }, T, done)
+    })
+
+    it('should resolve empty array for empty args', (done) => {
+      PUtils.filter([], noop)
+        .catch((err) => { return err })
+        .then((value) => {
+          expect(value).to.deep.equal([])
+        })
+        .then(done, done)
     })
 
     it('check filterer arguments', (done) => {
