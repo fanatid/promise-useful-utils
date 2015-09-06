@@ -88,6 +88,25 @@ function hasPromisified (object, key, suffix) {
 }
 
 /**
+ * @param {*}
+ * @return {boolean}
+ */
+function isClass (fn) {
+  try {
+    if (typeof fn !== 'function') {
+      return false
+    }
+
+    let names = Object.getOwnPropertyNames(fn.prototype)
+    return names.length > 1 ||
+           (names.length > 0 && !(names.length === 1 && names[0] === 'constructor')) ||
+           (/this\s*\.\s*\S+\s*=/.test(fn + '') && Object.getOwnPropertyNames(fn).length > 0)
+  } catch (err) {
+    return false
+  }
+}
+
+/**
  * @param {(function|string)} method
  * @param {Object} [receiver]
  * @return {function}
@@ -112,19 +131,6 @@ function makeNodePromisifier (method, receiver) {
 }
 
 /**
- * @param {function} nodeFunction
- * @param {*} [receiver]
- * @return {Promise}
- */
-export function promisify (nodeFunction, receiver = THIS) {
-  if (isPromisified(nodeFunction)) {
-    return nodeFunction
-  }
-
-  return makeNodePromisifier(nodeFunction, receiver)
-}
-
-/**
  * @param {Object} target
  * @param {string} suffix
  * @param {function} filter
@@ -138,27 +144,29 @@ function plainPromisifyAll (target, suffix, filter, promisifier) {
   for (let key of inheritedDataKeys(target)) {
     let value = target[key]
 
-    if (key === 'prototype' && typeof value === 'object') {
-      plainPromisifyAll(value, suffix, filter, promisifier)
-    }
-
-    if (key === 'constructor' || typeof value !== 'function') {
+    if (key === 'constructor' ||
+        typeof value !== 'function' ||
+        isPromisified(value) ||
+        hasPromisified(target, key, suffix) ||
+        !filter(key, value, target, defaultFilter(key, value, target))) {
       continue
     }
 
-    if (!isPromisified(value) &&
-        !hasPromisified(target, key, suffix) &&
-        filter(key, value, target, defaultFilter(key, value, target))) {
-      if (suffixRegexp.test(key)) {
-        let keyWithoutSuffix = key.replace(suffixRegexp, '')
-        if (methods[keyWithoutSuffix] !== undefined) {
-          throw new TypeError(
-            `Cannot promisify an API that has normal methods with ${suffix}-suffix`)
-        }
-      }
-
-      methods[key] = value
+    if (isClass(value) && value !== target) {
+      plainPromisifyAll(value, suffix, filter, promisifier)
+      plainPromisifyAll(value.prototype, suffix, filter, promisifier)
+      continue
     }
+
+    if (suffixRegexp.test(key)) {
+      let keyWithoutSuffix = key.replace(suffixRegexp, '')
+      if (methods[keyWithoutSuffix] !== undefined) {
+        throw new TypeError(
+          `Cannot promisify an API that has normal methods with ${suffix}-suffix`)
+      }
+    }
+
+    methods[key] = value
   }
 
   for (let key of Object.keys(methods)) {
@@ -172,6 +180,19 @@ function plainPromisifyAll (target, suffix, filter, promisifier) {
   }
 
   return target
+}
+
+/**
+ * @param {function} nodeFunction
+ * @param {*} [receiver]
+ * @return {Promise}
+ */
+export function promisify (nodeFunction, receiver = THIS) {
+  if (isPromisified(nodeFunction)) {
+    return nodeFunction
+  }
+
+  return makeNodePromisifier(nodeFunction, receiver)
 }
 
 /**
@@ -192,6 +213,10 @@ export function promisifyAll (target, opts) {
 
   if (!isIdentifier(suffix)) {
     throw new RangeError('suffix must be a valid identifier')
+  }
+
+  if (isClass(target)) {
+    plainPromisifyAll(target.prototype, suffix, filter, promisifier)
   }
 
   return plainPromisifyAll(target, suffix, filter, promisifier)

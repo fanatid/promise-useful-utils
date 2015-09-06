@@ -64,22 +64,30 @@ describe('Promisification', () => {
       fn2 (cb) { cb(null, 1) }
     }
 
-    class B extends A {
+    class B {
       static fn3 (cb) { cb(null, 1) }
       fn4 (cb) { cb(null, 1) }
-      fn5 (cb) { throw uerr }
-      fn6 (cb) { cb(uerr) }
     }
 
-    PUtils.promisifyAll(B)
+    class C extends A {
+      static B = B
+      static C = C
 
-    let b
+      static fn5 (cb) { cb(null, 1) }
+      fn6 (cb) { cb(null, 1) }
+      fn7 (cb) { throw uerr }
+      fn8 (cb) { cb(uerr) }
+    }
+
+    PUtils.promisifyAll(C)
+
+    let c
     beforeEach(() => {
-      b = new B()
+      c = new C()
     })
 
     it('should promisify static method of inherited class', (done) => {
-      B.fn1Async()
+      C.fn1Async()
         .then((value) => {
           expect(value).to.equal(1)
         })
@@ -87,22 +95,23 @@ describe('Promisification', () => {
     })
 
     it('should promisify method of inherited class', (done) => {
-      b.fn2Async()
+      c.fn2Async()
         .then((value) => {
           expect(value).to.equal(1)
         })
         .then(done, done)
     })
 
-    it('should promisify static method', (done) => {
-      B.fn3Async()
+    it('should promisify static method of static Class', (done) => {
+      C.B.fn3Async()
         .then((value) => {
           expect(value).to.equal(1)
         })
         .then(done, done)
     })
 
-    it('should promisify method', (done) => {
+    it('should promisify method of static Class', (done) => {
+      let b = new C.B()
       b.fn4Async()
         .then((value) => {
           expect(value).to.equal(1)
@@ -110,8 +119,24 @@ describe('Promisification', () => {
         .then(done, done)
     })
 
+    it('should promisify static method', (done) => {
+      C.fn5Async()
+        .then((value) => {
+          expect(value).to.equal(1)
+        })
+        .then(done, done)
+    })
+
+    it('should promisify method', (done) => {
+      c.fn6Async()
+        .then((value) => {
+          expect(value).to.equal(1)
+        })
+        .then(done, done)
+    })
+
     it('method throws error', (done) => {
-      b.fn5Async()
+      c.fn7Async()
         .then(() => { throw new Error() })
         .catch((err) => {
           expect(err).to.equal(uerr)
@@ -120,7 +145,7 @@ describe('Promisification', () => {
     })
 
     it('method return error', (done) => {
-      b.fn5Async()
+      c.fn8Async()
         .then(() => { throw new Error() })
         .catch((err) => {
           expect(err).to.equal(uerr)
