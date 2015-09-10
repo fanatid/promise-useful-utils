@@ -22,7 +22,7 @@
         * [Option: `filter`](#option-filter)
         * [Option: `promisifier`](#option-promisifier)
     * [`.fromNode(Function resolver)`](#fromnodefunction-resolver---promise)
-    * [`.asCallback(Promise promise, Function nodeback [, Object options])`](#ascallbackpromise-promise-function-nodeback--object-options---promise)
+    * [`.asCallback(Promise promise [, Function nodeback] [, Object options])`](#ascallbackpromise-promise--function-nodeback--object-options---promise)
         * [Option: `spread`](#option-spread)
   * [Timers](#timers)
     * [`.delay(int ms [, dynamic value])`](#delayint-ms--dynamic-value---promise)
@@ -598,7 +598,7 @@ PUtils.fromNode(object.foo.bind(object, "firstArgument"))
   .then((result) => { console.log(result) })
 ```
 
-#####`.asCallback(Promise promise, Function nodeback [, Object options])` -> `Promise`
+#####`.asCallback(Promise promise [, Function nodeback] [, Object options])` -> `Promise`
 
 Register a node-style callback on given promise. When promise is either fulfilled or rejected, the node callback will be called back with the node.js convention where error reason is the first argument and success value is the second argument. The error argument will be `null` in case of success.
 

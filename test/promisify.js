@@ -261,6 +261,15 @@ describe('Promisification', () => {
       spy = sinon.spy()
     })
 
+    it('should be fine when callback is undefined', (done) => {
+      PUtils.asCallback(Promise.resolve(1))
+        .catch((err) => { return err })
+        .then((value) => {
+          expect(value).to.equal(1)
+        })
+        .then(done, done)
+    })
+
     it('callback with resolution', (done) => {
       PUtils.asCallback(Promise.resolve(1), spy)
       setTimeout(() => {

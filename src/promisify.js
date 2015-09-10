@@ -251,16 +251,18 @@ export function fromNode (resolver) {
  * @return {Promise}
  */
 export function asCallback (promise, nodeback, options) {
-  Promise.resolve(promise)
-    .then((value) => {
-      if (Object(options).spread) {
-        let args = [null].concat(value)
-        nodeback(...args)
-        return
-      }
+  if (typeof nodeback === 'function') {
+    promise
+      .then((value) => {
+        if (Object(options).spread) {
+          let args = [null].concat(value)
+          nodeback(...args)
+          return
+        }
 
-      nodeback(null, value)
-    }, (err) => { nodeback(err) })
+        nodeback(null, value)
+      }, (err) => { nodeback(err) })
+  }
 
   return promise
 }
