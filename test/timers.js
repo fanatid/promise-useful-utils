@@ -23,6 +23,12 @@ describe('Timers', () => {
     })
   })
 
+  describe('.sleep', () => {
+    it('should be alias to .delay', () => {
+      expect(PUtils.sleep).to.equal(PUtils.delay)
+    })
+  })
+
   describe('.timeout', () => {
     it('should reject', (done) => {
       PUtils.timeout(1)

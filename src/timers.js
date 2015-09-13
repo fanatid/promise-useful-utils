@@ -13,6 +13,8 @@ export function delay (ms, value) {
   })
 }
 
+export let sleep = delay
+
 /**
  * @param {number} ms
  * @param {Error} [err]
